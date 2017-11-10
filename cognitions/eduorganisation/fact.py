@@ -22,5 +22,5 @@ def elasticExporter(match, ExportFileWriter, isbn, pages, lineNum):
 
 
 def annotationSettings():
-  extractors[name] = {}; extractors[name]['color'] = "#0713ff"; extractors[name]['opacity'] = "0.2"
+  extractors = {}; extractors['color'] = "#0713ff"; extractors['opacity'] = "0.2"
   return extractors

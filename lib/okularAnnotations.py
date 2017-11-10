@@ -12,7 +12,7 @@ def AnnotationEnd():
   return '</hl>\n</annotation>\n</annotationList>\n'
 
 
-def annotate(AnnotationsFileWriter, AnnotationMode, currDatetime, pages, line, start, stop, color='#0713ff', opacity='0.2'):
+def annotate(AnnotationsFileWriter, AnnotationMode, currDatetime, pages, line, start, stop, color, opacity):
   stop = stop - 1
   boxCoordinates1 = line.char_bboxes[start].as_tuple()
   x11 = round(boxCoordinates1[0]/pages.size[0], 6) 

@@ -11,9 +11,10 @@ def nerFromPDF(fileLoc, filename, extractor, AnnotationMode, AnnotationsFileWrit
   from random import seed as random_seed  
   import importlib
   lineNum = 0  
-  fact = {}
+  fact = {}; annotationSettings = {}
   for ex in cognitions:
-    fact[ex] = importlib.import_module('cognitions.' + ex.lower() + '.fact')  
+    fact[ex] = importlib.import_module('cognitions.' + ex.lower() + '.fact')
+    annotationSettings[ex] = fact[ex].annotationSettings()
     
   document = pdf.Document(fileLoc.encode())
   
@@ -36,7 +37,7 @@ def nerFromPDF(fileLoc, filename, extractor, AnnotationMode, AnnotationsFileWrit
                     for match in matches:
                       start, stop = match.span
                       fact[ex].elasticExporter(match, extractor[ex]['FileWriter'], isbn, pages, lineNum)
-                      annotate(AnnotationsFileWriter, AnnotationMode, currDatetime, pages, line, start, stop, )                    
+                      annotate(AnnotationsFileWriter, AnnotationMode, currDatetime, pages, line, start, stop, annotationSettings[ex]['color'], annotationSettings[ex]['opacity'])                    
                     
 
       if AnnotationMode == 'single':
