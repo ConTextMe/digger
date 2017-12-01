@@ -8,10 +8,10 @@ def fileInit(context, filename):
   return ExportFileWriter
   
   
-def elasticExporter(match, ExportFileWriter, isbn, pages, lineNum):
+def elasticExporter(match, ExportFileWriter, isbn, page, lineNum):
     data = {
       "isbn" : isbn,      
-      "page" : pages.page_no,       
+      "page" : page,       
       "line_abs" : lineNum,       
       "class" : name,
       "orgname" : match.fact.name,

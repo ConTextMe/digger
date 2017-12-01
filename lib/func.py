@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 from io import open
 import os
 
+def get_runPath():
+    return os.path.join(os.path.dirname(__file__))
+
 def get_dictPath(cognition, filename):
     return os.path.join(os.path.dirname(__file__) + '/../cognitions/' + cognition, filename)
 
