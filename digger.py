@@ -72,33 +72,42 @@ docFilename = str(os.path.getsize(args.fileLoc)) + '.' + os.path.basename(args.f
 ###
 
 if action == 'dig':
+
+  textFileWriter = open('/tmp/ner/' + docFilename + '.txt','w')
+  from lib.dig_pdfminer import digTextFromPDF
+  digTextFromPDF(args,textFileWriter)
+  textFileWriter.close()
+
+
+if action == 'extract':
+  from lib.extract import annExtracter
   ### DIR INIT
   popen('mkdir -p /tmp/ner')
   popen('rm /tmp/ner/' + docFilename + '_*.nlp')
-  ###
-
-  ### Annotation init
-  from lib.okularAnnotations import annotate
-  AnnotationsFileWriter = open('/tmp/ner/' + docFilename + '.xml','w')
-  ###
-
+  ###  
+  
   ### EXTRACTORS
   from lib.extractors import init, ExportFileClose
   extractor = init(args.context, docFilename, cognitions)
   from lib.dig_pdfminer import digUsingNer
   digUsingNer(args, docFilename, extractor, AnnotationMode, AnnotationsFileWriter, currDatetime, isbn, cognitions)
   ExportFileClose(extractor, cognitions)
-  ###
-
-  ### CLOSE ANNOTATION & MV
-  AnnotationsFileWriter.close()
-  ###
-
+  ###  
+  
   ### FINAL SED
   popen("sed -i 's/None/\"None\"/g' /tmp/ner/*.nlp")
   popen("sed -i 's/\\x27/\"/g' /tmp/ner/*.nlp")
   ###
-
-if action == 'extract':
-  from lib.extract import annExtracter
+  
   annExtracter()
+
+
+### ??
+  #### Annotation init
+  #from lib.okularAnnotations import annotate
+  #AnnotationsFileWriter = open('/tmp/ner/' + docFilename + '.xml','w')
+  ####
+
+  #### CLOSE ANNOTATION & MV
+  #AnnotationsFileWriter.close()
+  ####
