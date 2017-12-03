@@ -1,17 +1,32 @@
-def AnnotationBegin(currDatetime,color,opacity):
-  return '<annotationList>\n<annotation type="4">\n<base creationDate="' + currDatetime + '" flags="0" modifyDate="' + currDatetime + '"  opacity="' + opacity + '" author="http://context.me/digest" color="' + color + '" uniqueName="digest-{00000000-0000-0000-0000-000000000001}"><boundary l="0" r="0" b="0" t="0"/></base>\n<hl>\n'
-  
+def AnnotationsFileInit(AnnotationsFileWriter, fileLoc):
+  AnnotationsFileWriter.write('<?xml version="1.0" encoding="utf-8"?>\n')
+  AnnotationsFileWriter.write('<!DOCTYPE documentInfo>\n')
+  AnnotationsFileWriter.write('<documentInfo url="' + fileLoc + '">\n')
+  AnnotationsFileWriter.write(' <pageList>\n')
 
-def annotate(AnnotationsFileWriter, AnnotationMode, currDatetime, pages, line, start, stop, color, opacity):
-  stop = stop - 1
-  boxCoordinates1 = line.char_bboxes[start].as_tuple()
-  x11 = round(boxCoordinates1[0]/pages.size[0], 6) 
-  y11 = round(boxCoordinates1[1]/pages.size[1], 6)
-  boxCoordinates2 = line.char_bboxes[stop].as_tuple()
-  x22 = round(boxCoordinates2[2]/pages.size[0], 6)
-  y22 = round(boxCoordinates2[3]/pages.size[1], 6)
-  if AnnotationMode == 'multiple':
-    AnnotationsFileWriter.write(AnnotationBegin(currDatetime, color, opacity))
-  AnnotationsFileWriter.write('')  
-  quad = '<quad ax="' + str(x11) + '" bx="' + str(x22) + '" dx="'+ str(x11) + '" cx="' + str(x22) + '" dy="' + str(y22) + '" cy="' + str(y22)  + '" by="' + str(y11) + '" ay="' + str(y11) + '" feather="1"/>\n'
-  AnnotationsFileWriter.write(quad)
+
+def AnnotationPageBegin(AnnotationsFileWriter, page):
+  AnnotationsFileWriter.write('  <page number="' + str(page-1) + '">\n')
+
+
+def AnnotationPageEnd(AnnotationsFileWriter):
+  AnnotationsFileWriter.write('   </page>\n') 
+  AnnotationsFileWriter.write('  </pageList>\n </documentInfo>')
+ 
+ 
+def AnnotationListBegin(AnnotationsFileWriter, currDatetime, color='#0713ff', opacity='0.2'):
+  AnnotationsFileWriter.write('   <annotationList>\n    <annotation type="4">\n     <base creationDate="' + currDatetime + '" flags="0" modifyDate="' + currDatetime + '"  opacity="' + opacity + '" author="digger" color="' + color + '" uniqueName="okular-{00000000-0000-0000-0000-000000000001}">\n      <boundary l="0" r="0" b="0" t="0"/>\n     </base>\n     <hl>\n')
+
+
+def AnnotationQuad(AnnotationsFileWriter, size, coords):
+  coords["posXBegin"] = round(coords["posXBegin"]/size["w"], 6) 
+  coords["posXEnd"] = round(coords["posXEnd"]/size["w"], 6)
+  coords["posYBegin"] = round(coords["posYBegin"]/size["h"], 6)
+  coords["posYEnd"] = round(coords["posYEnd"]/size["h"], 6)
+ 
+  AnnotationsFileWriter.write('      <quad ax="' + str(coords["posXBegin"]) + '" bx="' + str(coords["posXEnd"]) + '" dx="'+ str(coords["posXBegin"]) + '" cx="' + str(coords["posXEnd"]) + '" dy="' + str(coords["posYEnd"]) + '" cy="' + str(coords["posYEnd"])  + '" by="' + str(coords["posYBegin"]) + '" ay="' + str(coords["posYBegin"]) + '" feather="1"/>\n')
+
+    
+def AnnotationListEnd(AnnotationsFileWriter):
+  AnnotationsFileWriter.write('     </hl>\n      </annotation>\n    </annotationList>\n')
+    

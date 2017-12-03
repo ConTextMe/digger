@@ -36,35 +36,41 @@ class PDFPageDetailedAggregator(PDFPageAggregator):
               if isinstance(child, (LTChar)):
                 charCoords[charsNumber]["x0"] = child.x0
                 charCoords[charsNumber]["x1"] = child.x1
-                charCoords[charsNumber]["y"] = child.y1
-              #print(child)
+                charCoords[charsNumber]["y0"] = child.y0                
+                charCoords[charsNumber]["y1"] = child.y1
+                #print(child)
 
               #print("Char: " + charText + " , Ord: " + str(charTextOrd))
-              if charTextOrd in (32, 33, 44, 45, 173, 58, 59, 10):                
-                if charTextOrd == 10:
+              if charTextOrd in (10, 32, 33, 45, 46, 58, 59, 173): #\n_\s_,_._:_;_\xad
+                #print("ord : " + str(charTextOrd) + ", chNum : " + str(charsNumber) + ", ch : " + str(child))
+                if isinstance(child,LTAnno) and charTextOrd == 10: 
                   self.stringNumberAbs += 1
                   self.stringNumber += 1
-                  word = word + '\n'
+                  word = word + '\\n'
                   wordLen = 0
+                elif charTextOrd == 173: 
+                  word = word + '\\xad'
+                  wordLen = len(word)
                 else:
                   wordLen = len(word)
                   
                 if isinstance(child, (LTChar)):
-                  #print("a : " + charCoords + ", ch : " + charsNumber)
-                  wordXBegin = charCoords[charsNumber-wordLen+1]["x0"];
+                  wordXBegin = charCoords[charsNumber-wordLen]["x0"];
                   wordXEnd = charCoords[charsNumber]["x0"];
-                  wordY = charCoords[charsNumber]["y"];
+                  wordYBegin = charCoords[charsNumber]["y0"];
+                  wordYEnd = charCoords[charsNumber]["y1"];                  
                 else:
-                  wordXBegin = 0; wordXEnd = 0; wordY = 0;    
+                  wordXBegin = 0; wordXEnd = 0; wordYBegin = 0; wordYEnd = 0;
                 
-                self.rows[pageNumber][self.stringNumber][wordNumber]["len"] = wordLen
-                self.rows[pageNumber][self.stringNumber][wordNumber]["text"] = word
-                self.rows[pageNumber][self.stringNumber][wordNumber]["posXBegin"] = wordXBegin
-                self.rows[pageNumber][self.stringNumber][wordNumber]["posXEnd"] = wordXEnd
-                self.rows[pageNumber][self.stringNumber][wordNumber]["posY"] = wordY
-                self.rows[pageNumber][self.stringNumber][wordNumber]["charEnd"] = charsNumber
-                self.rows[pageNumber][self.stringNumber][wordNumber]["absLine"] = self.stringNumberAbs                
-                #print(" p: " + str(pageNumber) + " s: " + str(self.stringNumber) + " sAbs: " + str(self.stringNumberAbs) + " w: " + str(wordNumber))
+                #print(" p: " + str(pageNumber) + " s: " + str(self.stringNumber) + " sAbs: " + str(self.stringNumberAbs) + " w: " + str(wordNumber))                
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["len"] = wordLen
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["text"] = word
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXBegin"] = float("{0:.6f}".format(wordXBegin))
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXEnd"] = float("{0:.6f}".format(wordXEnd))
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYBegin"] = float("{0:.6f}".format(wordYBegin))
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYEnd"] = float("{0:.6f}".format(wordYEnd))
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["charEnd"] = charsNumber
+                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["absLine"] = self.stringNumberAbs                
                 wordNumber = wordNumber +1
                 word = ''
               
@@ -75,7 +81,9 @@ class PDFPageDetailedAggregator(PDFPageAggregator):
           for child in item:
             render(child, pageNumber,stringNumber, stringNumberAbs)
         return
-      self.rows = defaultdict(lambda :defaultdict(lambda :defaultdict(lambda :defaultdict())))
+      self.rows = defaultdict(lambda :defaultdict(lambda :defaultdict(lambda :defaultdict(lambda :defaultdict()))))
+      self.rows[ltpage.pageid]["size"]["h"] = ltpage.height
+      self.rows[ltpage.pageid]["size"]["w"] = ltpage.width
       render(ltpage, ltpage.pageid,self.stringNumber, self.stringNumberAbs)
       self.stringNumber = 1
       self.result = ltpage
@@ -83,7 +91,7 @@ class PDFPageDetailedAggregator(PDFPageAggregator):
       
     
 
-def digTextFromPDF(args, textFileWriter):
+def digTextFromPDF(args, textFileWriter,currDatetime,docFilename):
   import io, sys, re, timeit
   import time
 
@@ -106,30 +114,46 @@ def digTextFromPDF(args, textFileWriter):
   interpreter = PDFPageInterpreter(rsrcmgr, device)
   
   pageNum = 1
-  textCatenated = ""
+  struct = defaultdict(lambda :defaultdict(lambda :defaultdict()))
   for page in PDFPage.create_pages(document):
     pageTime = time.time()   
     interpreter.process_page(page)    
     layout = device.rows
-    #print("#### P #### : " + str(pageNum))    
-    for strings in layout[pageNum]:
-      #print("#### S #### : " + str(strings))
-      for words in layout[pageNum][strings]:
-        #print("#### W #### : " + str(layout[pageNum][strings][words]["text"]))        
-        textCatenated  += layout[pageNum][strings][words]["text"]
-    print("--- %s seconds on page %s---" % (time.time() - pageTime, pageNum))
+    struct[pageNum]=layout[pageNum]
     pageNum += 1
-    #extracted_text = getTextPerPage(layout)
-  print(textCatenated)
+    
+  #debug_struct(struct)
+  struct_annotate(args,struct,currDatetime,docFilename)
+    
+def debug_struct(struct):
+  textCatenated = ""
+  for page in struct:
+    print("#### P #### : " + str(page))    
+    for string in struct[page]["strings"]:
+      print("#### S #### : " + str(string))
+      for word in struct[page]["strings"][string]:
+        print("#### W #### : " + str(struct[page]["strings"][string][word]["text"]))        
+        textCatenated  += struct[page]["strings"][string][word]["text"]
 
-def get_text_per_page(layout):
-  import pdfminer.layout  
-  import re
-  extracted_text = ""
-  for lt_obj in layout:
-    if isinstance(lt_obj, pdfminer.layout.LTTextBox) or isinstance(lt_obj, pdfminer.layout.LTTextLine):
-      for w_obj in lt_obj:
-          #for a_obj in w_obj:
-        extracted_text = re.split('.[0-9][0-9][0-9] \'|.[0-9][0-9][0-9] \"',str(w_obj))[1][:-2]
-    extracted_text = extracted_text.replace('\\xad\\n', '').replace(' \\n', ' ').replace('.\\n', ' ').replace('-\\n', '').replace('\\n', ' ')
-  return extracted_text
+def struct_annotate(args, struct, currDatetime, docFilename):
+  import lib.okularAnnotations
+  import shutil
+  from os.path import expanduser
+  
+  AnnotationsFileWriter = open('/tmp/ner/' + docFilename + '.xml','w')
+  lib.okularAnnotations.AnnotationsFileInit(AnnotationsFileWriter, args.fileLoc)
+  for page in struct:
+    lib.okularAnnotations.AnnotationPageBegin(AnnotationsFileWriter,page)
+    lib.okularAnnotations.AnnotationListBegin(AnnotationsFileWriter,currDatetime)
+    for string in struct[page]["strings"]:
+      for word in struct[page]["strings"][string]:
+        lib.okularAnnotations.AnnotationQuad(AnnotationsFileWriter,struct[page]["size"],struct[page]["strings"][string][word])
+    lib.okularAnnotations.AnnotationListEnd(AnnotationsFileWriter)
+    lib.okularAnnotations.AnnotationPageEnd(AnnotationsFileWriter)
+  
+  AnnotationsFileWriter.close()
+  shutil.move('/tmp/ner/' + docFilename + '.xml', str(expanduser("~")) + '/.local/share/okular/docdata/' + docFilename + '.xml')  
+          
+        
+
+    #extracted_text = extracted_text.replace('\\xad\\n', '').replace(' \\n', ' ').replace('.\\n', ' ').replace('-\\n', '').replace('\\n', ' ')

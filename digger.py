@@ -75,7 +75,7 @@ if action == 'dig':
 
   textFileWriter = open('/tmp/ner/' + docFilename + '.txt','w')
   from lib.dig_pdfminer import digTextFromPDF
-  digTextFromPDF(args,textFileWriter)
+  digTextFromPDF(args,textFileWriter,currDatetime,docFilename)
   textFileWriter.close()
 
 
