@@ -54,21 +54,16 @@ class PDFPageDetailedAggregator(PDFPageAggregator):
                 else:
                   wordLen = len(word)
                   
-                if isinstance(child, (LTChar)):
-                  wordXBegin = charCoords[charsNumber-wordLen]["x0"];
-                  wordXEnd = charCoords[charsNumber]["x0"];
-                  wordYBegin = charCoords[charsNumber]["y0"];
-                  wordYEnd = charCoords[charsNumber]["y1"];                  
-                else:
-                  wordXBegin = 0; wordXEnd = 0; wordYBegin = 0; wordYEnd = 0;
+                if isinstance(child, (LTChar)): 
+                  self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXBegin"] = float("{0:.6f}".format(charCoords[charsNumber-wordLen]["x0"]))
+                  self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXEnd"] = float("{0:.6f}".format(charCoords[charsNumber]["x0"]))
+                  self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYBegin"] = float("{0:.6f}".format(self.rows[ltpage.pageid]["size"]["h"] - charCoords[charsNumber]["y0"]))
+                  self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYEnd"] = float("{0:.6f}".format(self.rows[ltpage.pageid]["size"]["h"] - charCoords[charsNumber]["y1"]))            
                 
                 #print(" p: " + str(pageNumber) + " s: " + str(self.stringNumber) + " sAbs: " + str(self.stringNumberAbs) + " w: " + str(wordNumber))                
                 self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["len"] = wordLen
                 self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["text"] = word
-                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXBegin"] = float("{0:.6f}".format(wordXBegin))
-                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posXEnd"] = float("{0:.6f}".format(wordXEnd))
-                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYBegin"] = float("{0:.6f}".format(wordYBegin))
-                self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["posYEnd"] = float("{0:.6f}".format(wordYEnd))
+
                 self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["charEnd"] = charsNumber
                 self.rows[pageNumber]["strings"][self.stringNumber][wordNumber]["absLine"] = self.stringNumberAbs                
                 wordNumber = wordNumber +1
@@ -141,7 +136,7 @@ def struct_annotate(args, struct, currDatetime, docFilename):
   from os.path import expanduser
   
   AnnotationsFileWriter = open('/tmp/ner/' + docFilename + '.xml','w')
-  lib.okularAnnotations.AnnotationsFileInit(AnnotationsFileWriter, args.fileLoc)
+  lib.okularAnnotations.AnnotationsBegin(AnnotationsFileWriter, args.fileLoc)
   for page in struct:
     lib.okularAnnotations.AnnotationPageBegin(AnnotationsFileWriter,page)
     lib.okularAnnotations.AnnotationListBegin(AnnotationsFileWriter,currDatetime)
@@ -150,6 +145,7 @@ def struct_annotate(args, struct, currDatetime, docFilename):
         lib.okularAnnotations.AnnotationQuad(AnnotationsFileWriter,struct[page]["size"],struct[page]["strings"][string][word])
     lib.okularAnnotations.AnnotationListEnd(AnnotationsFileWriter)
     lib.okularAnnotations.AnnotationPageEnd(AnnotationsFileWriter)
+  lib.okularAnnotations.AnnotationEnd(AnnotationsFileWriter)
   
   AnnotationsFileWriter.close()
   shutil.move('/tmp/ner/' + docFilename + '.xml', str(expanduser("~")) + '/.local/share/okular/docdata/' + docFilename + '.xml')  
