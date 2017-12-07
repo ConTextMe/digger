@@ -74,7 +74,7 @@ docFilename = str(os.path.getsize(args.fileLoc)) + '.' + os.path.basename(args.f
 if action == 'dig':
 
   textFileWriter = open('/tmp/ner/' + docFilename + '.txt','w')
-  from lib.dig_pdfminer import digTextFromPDF
+  from lib.dig_pdf import digTextFromPDF
   digTextFromPDF(args,textFileWriter,currDatetime,docFilename)
   textFileWriter.close()
 
