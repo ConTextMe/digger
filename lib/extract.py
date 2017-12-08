@@ -1,7 +1,16 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-
-## ## ## ## ## python 3 only ## ## ## ## ## 
+######     ######     ######     ######     ######
+##     / / / /    License    \ \ \ \ 
+##  ConTextMe copyleft culture, Copyright (C)
+##  is prohibited here. This work is licensed 
+##  under a CC BY-SA 4.0,
+##  Creative Commons Attribution-ShareAlike 4.0,
+##  http://creativecommons.org/licenses/by-sa/4.0
+######     ######     ######     ######     ######
+##    / / / /    Code Climate    \ \ \ \ 
+##    Language = python3
+##    Indent = space;    2 chars;
+######     ######     ######     ######     ######
 
 
 def nerFromPDF(fileLoc, filename, extractor, AnnotationMode, AnnotationsFileWriter, currDatetime, isbn, context, cognitions):

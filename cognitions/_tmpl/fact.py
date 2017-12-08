@@ -1,3 +1,17 @@
+# -*- coding: utf-8 -*-
+######     ######     ######     ######     ######
+##     / / / /    License    \ \ \ \ 
+##  ConTextMe copyleft culture, Copyright (C)
+##  is prohibited here. This work is licensed 
+##  under a CC BY-SA 4.0,
+##  Creative Commons Attribution-ShareAlike 4.0,
+##  http://creativecommons.org/licenses/by-sa/4.0
+######     ######     ######     ######     ######
+##    / / / /    Code Climate    \ \ \ \ 
+##    Language = python3
+##    Indent = space;    2 chars;
+######     ######     ######     ######     ######
+
 name = '_tmpl'
 
 def fileInit(context, filename):
