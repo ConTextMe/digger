@@ -38,17 +38,18 @@ def digTextFromPDF(args,session):
     intermStruct = OrderedDict()
     intermStruct = lib.digPDFStemmer_sentence.makeIntermStruct(struct)    
     sentenceStruct = lib.digPDFStemmer_sentence.makeSentenceStruct(intermStruct)
-    dump = json.dumps(sentenceStruct)
+    dump = json.dumps(sentenceStruct, indent=1, ensure_ascii=False)
     with open(fnameSentence, 'w') as f:
       f.write(dump)
-      print(11111)
   
-  if args.annselftest == 1:
+  if "annselftest" in args and args.annselftest == 1:
     import lib.okularAnnotations
     lib.okularAnnotations.struct_annotate(args,sentenceStruct,session)
+    
+  return sentenceStruct
 
-  #for page in sentenceStruct:
-    #for sentence in sentenceStruct[page]:  
-      #if "p" in sentenceStruct[page][sentence]:
-        #print(sentenceStruct[page][sentence]["s"])
+
+def digAnnoFromPDF(args,session):
+  import lib.digPDFStemmer_word
+  struct = lib.digPDFStemmer_word.getPDFStruct(args)
       

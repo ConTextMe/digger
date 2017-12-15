@@ -22,6 +22,7 @@ import shutil
 import os
 import re
 from os import popen
+import subprocess
 from os.path import expanduser
 import datetime
 from collections import OrderedDict
@@ -41,10 +42,12 @@ currDatetime = datetime.datetime.now()
 session['currDatetime'] = currDatetime.strftime("%Y-%m-%dT%H:%M:%S")
 ExtractorHandler = {}
 
-actions = ['dig', 'extract', 'clear']
+actions = ['dig', 'extract', 'clean', 'get', 'generate']
 actionsDig = ['all', 'mine', 'by']
 actionsMined = ['all','my', 'by']
 actionsMinedBy = ['author','scheme','viewpoint', 'date']
+actionsGenerate = ['annschema', 'toc']
+actionsGet = ['hash', 'isbn']
 ###
 
 ### VARS
@@ -58,8 +61,8 @@ else:
 p.add_argument('action2', choices=actions)    
 p.add_argument('-c', dest="context",  type=str, required=True, help='Document context')
 p.add_argument('-f', dest="fileLoc",  type=str, required=True, help='Filename to dig')
-p.add_argument('--clear-read', dest="exPDF", type=int, default=0, help='Recreate a pdf_dig pdfreader structure if cached')
-p.add_argument('--clear-sent', dest="exPDF", type=int, default=0, help='Recreate a pdf_dig sentence structure if cached')
+p.add_argument('--repdfreader', dest="repdfreader", type=int, default=0, help='Recreate a pdf_dig pdfreader structure if cached')
+p.add_argument('--resentence', dest="resentence", type=int, default=0, help='Recreate a pdf_dig sentence structure if cached')
 
 if action == 'dig':
   print('Woh, digging')  
@@ -72,9 +75,20 @@ elif action == 'dig' or action == 'extract' :
 
 elif action == 'extract':    
   print('Hey, extracting')
-elif action == 'clear':
-  print('Hoy, clearing')
 
+elif action == 'clean':
+  print('Hoy, cleaning')
+
+elif action == 'get':
+  p.add_argument('--gettype', dest="gettype",  choices=actionsGet, type=str, required=True, help='Digger get action')
+  
+  print('Wow, new text')
+
+elif action == 'generate':
+  print('Doh, generating')
+  p.add_argument('--gentype', dest="gentype",  choices=actionsGenerate, type=str, required=True, help='Digger generate action')
+  
+  
 p.add_argument('--debug', dest="debug",  action='store_true', default=0, help='Document context')
 
 args = p.parse_args()
@@ -90,10 +104,11 @@ session['docFilename'] = str(os.path.getsize(args.fileLoc)) + '.' + os.path.base
 ###
 
 if action == 'dig':
-  from lib.digPDF import digTextFromPDF
-  digTextFromPDF(args,session)
+  from lib.digPDF import digTextFromPDF, digAnnoFromPDF
+  #digTextFromPDF(args,session)
+  digAnnoFromPDF(args,session)
 
-if action == 'extract':
+elif action == 'extract':
   from lib.extract import annExtracter
   ### DIR INIT
   popen('mkdir -p /tmp/ner')
@@ -115,13 +130,29 @@ if action == 'extract':
   
   annExtracter()
 
+elif action == 'clean':
+  tmpdir = session['tmp_path'] + "/tmp/"
+  os.makedirs(tmpdir, exist_ok=True)
+  subprocess.Popen(['cp', args.fileLoc, tmpdir]).wait()
+  subprocess.Popen(['pdftk', tmpdir + os.path.basename(args.fileLoc), 'output', tmpdir + os.path.basename(args.fileLoc) + '.unc', 'uncompress']).wait()
+  subprocess.Popen(["sed -n '/^\/Annots/!p' " + tmpdir + os.path.basename(args.fileLoc) + '.unc > ' + tmpdir + os.path.basename(args.fileLoc) + '.unoannot'], env={'LANG':'C'}, shell=True).wait()
+  subprocess.Popen(["pdftk", tmpdir + os.path.basename(args.fileLoc) + ".unoannot", "output", tmpdir + os.path.basename(args.fileLoc), "compress"]).wait()
+  subprocess.Popen(["rm " + tmpdir + os.path.basename(args.fileLoc) + ".*"], shell=True).wait()
 
-### ??
-  #### Annotation init
-  #from lib.okularAnnotations import annotate
-  #AnnotationsFileWriter = open(tmp_path + docFilename + '.xml','w')
-  ####
 
-  #### CLOSE ANNOTATION & MV
-  #AnnotationsFileWriter.close()
-  ####
+elif action == 'get':
+  from lib.get import getPDF, getPDFAnnotations
+  #print(getPDF(args))
+  print(getPDFAnnotations(args, mode="author"))
+    
+  
+elif action == 'generate':
+  from lib.digPDF import digTextFromPDF
+  from lib.extractFunc import extractAnnSchema
+  from os.path import expanduser
+  
+  sentenceStruct = digTextFromPDF(args,session)
+  AnnSchemaFile = str(expanduser("~")) + '/.config/okularpartrc'
+  AnnSchemaFileWriter = open(AnnSchemaFile,'w')
+  extractAnnSchema(sentenceStruct, AnnSchemaFileWriter)
+  AnnSchemaFileWriter.close()
