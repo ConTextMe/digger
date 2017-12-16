@@ -12,32 +12,32 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 import json
 import os.path
 
 def digTextFromPDF(args,session):
   
   sentenceStruct = OrderedDict()
-  fnameSentence = session['tmp_path'] + session['docFilename'] + '_sentence.json'
+  fnameSentence = session['diggedPath'] + session['srcHash'] + '.json'
   if os.path.isfile(fnameSentence):
     with open(fnameSentence, 'r') as f:
       sentenceStruct = json.load(f, object_pairs_hook=OrderedDict)
   else:
-    fnameStruct = session['tmp_path'] + session['docFilename'] + '_pdfreader.json'
+    fnameStruct = session['pdfstructPath'] + session['srcHash'] + '.json'
     if os.path.isfile(fnameStruct):
       with open(fnameStruct, 'r') as f:
         struct = json.load(f, object_pairs_hook=OrderedDict)
     else:
-      import lib.digPDFStemmer_word
-      struct = lib.digPDFStemmer_word.getPDFStruct(args)
+      import lib.dig_PDFStemWord
+      struct = lib.dig_PDFStemWord.getPDFStruct(args, session)
       dump = json.dumps(struct)
       with open(fnameStruct, 'w') as f:
         f.write(dump)
-    import lib.digPDFStemmer_sentence
+    import lib.dig_PDFStemSentence
     intermStruct = OrderedDict()
-    intermStruct = lib.digPDFStemmer_sentence.makeIntermStruct(struct)    
-    sentenceStruct = lib.digPDFStemmer_sentence.makeSentenceStruct(intermStruct)
+    intermStruct = lib.dig_PDFStemSentence.makeIntermStruct(struct)    
+    sentenceStruct = lib.dig_PDFStemSentence.makeSentenceStruct(intermStruct)
     dump = json.dumps(sentenceStruct, indent=1, ensure_ascii=False)
     with open(fnameSentence, 'w') as f:
       f.write(dump)
@@ -47,9 +47,3 @@ def digTextFromPDF(args,session):
     lib.okularAnnotations.struct_annotate(args,sentenceStruct,session)
     
   return sentenceStruct
-
-
-def digAnnoFromPDF(args,session):
-  import lib.digPDFStemmer_word
-  struct = lib.digPDFStemmer_word.getPDFStruct(args)
-      

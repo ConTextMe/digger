@@ -21,7 +21,7 @@ from pdfminer.layout import LTPage, LTChar, LTAnno, LAParams, LTTextBox, LTTextL
 from collections import defaultdict, OrderedDict
 import multiprocessing
 
-def getPDFStruct(args):
+def getPDFStruct(args,session):
   import time
 
   startTime = time.time()
@@ -31,7 +31,7 @@ def getPDFStruct(args):
   boxes_flow = 0
   line_margin = 0.3
 
-  documentFile = open(args.fileLoc, 'rb')
+  documentFile = open(session['srcPath'] + session['srcHash'] + '.pdf', 'rb')
   parser = PDFParser(documentFile)
   document = PDFDocument(parser, "")
   rsrcmgr = PDFResourceManager()

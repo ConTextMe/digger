@@ -38,3 +38,9 @@ def load_regex(filename):
             line = maybe_strip_comment(line)
             res = res + line + "|"
     return res[:-1] 
+  
+def dumpInits(args, session, message):
+ print('### ' + message + '.   session: ' + str(session) + ', args:' + str(args)) 
+
+def dumpVar(var, message):
+ print('### ' + message + ':' + str(var)) 

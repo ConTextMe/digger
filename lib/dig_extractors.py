@@ -12,19 +12,19 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
-def init(context, docFilename, cognitions):
+def init(args, session):
   import importlib
   extractor = {}
   
-  for ex in cognitions:
+  for ex in session['cognitions']:
     extractor[ex] = {}
     facts = importlib.import_module('cognitions.' + ex.lower() + '.fact')
     grammar = importlib.import_module('cognitions.' + ex.lower() + '.grammar')  
-    extractor[ex]['FileWriter'] = facts.fileInit(context, docFilename)
+    extractor[ex]['FileWriter'] = facts.fileInit(args, session)
     extractor[ex]['ExtractorHandler'] = eval('grammar.' + ex + 'Extractor')()
   return extractor
 
 
-def ExportFileClose(extractor, cognitions):
-  for ex in cognitions:
+def ExportFileClose(extractor, session):
+  for ex in session['cognitions']:
     extractor[ex]['FileWriter'].close() 

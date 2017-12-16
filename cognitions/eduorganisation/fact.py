@@ -14,19 +14,19 @@
 
 name = 'eduorganisation'
 
-def fileInit(context, filename):
-  ExportIndexdata='{"index":{"_index":"' + context + '","_type":"' + name + '"}}'
-  ExportFile = '/tmp/ner/' + filename + '__' + name + '.nlp'
+def fileInit(args, session):
+  ExportIndexdata='{"index":{"_index":"' + args.context + '","_type":"' + name + '"}}'
+  ExportFile = session['esPath'] + session['contentHash'] + '_' + name + '.json'
   ExportFileWriter = open(ExportFile,'w')
   ExportFileWriter.write(ExportIndexdata + '\n')
   return ExportFileWriter
   
   
-def elasticExporter(match, ExportFileWriter, isbn, page, lineNum):
+def elasticExporter(args, session, match, ExportFileWriter, page, sentence):
     data = {
-      "isbn" : isbn,      
+      #"isbn" : isbn,      
       "page" : page,       
-      "line_abs" : lineNum,       
+      "sentence" : sentence,       
       "class" : name,
       "orgname" : match.fact.name,
       "tmp" : match.fact.tmp,

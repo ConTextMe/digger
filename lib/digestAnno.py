@@ -12,11 +12,11 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
-def struct_annotate(args, sentenceStruct, session):
+def struct_annotate(args, session, sentenceStruct):
   import shutil
   from os.path import expanduser
     
-  AnnotationsFileWriter = open(session['tmp_path'] + session['docFilename'] + '.xml','w')
+  AnnotationsFileWriter = open(session['mainPath'] + session['docFilename'] + '.xml','w')
   AnnotationsBegin(AnnotationsFileWriter, args.fileLoc)
   for page in sentenceStruct:
     AnnotationPageBegin(AnnotationsFileWriter,int(page))
