@@ -41,6 +41,7 @@ def makeIntermStruct(struct):
 def makeSentenceStruct(struct):
   sentence = ''
   sentenceWords = OrderedDict()
+  sentenceWordsMap = OrderedDict()
   wordNumber = 1
   sentenceRule = ''
   sentenceStemmer = 0
@@ -50,7 +51,7 @@ def makeSentenceStruct(struct):
     #print("#### P #### : " + str(page))   
     if page not in sentenceStruct:
       sentenceStruct[page] = OrderedDict()
-      sentenceStruct[page]["size"] = struct[page]["size"]
+      sentenceStruct[page]["par"] = {'size' : struct[page]["size"] }
     sentenceNumber = 1
     for string in struct[page]["strings"]:
       if sentenceNumber not in sentenceStruct[page]:
@@ -59,14 +60,13 @@ def makeSentenceStruct(struct):
       for word in struct[page]["strings"][string]:
         wordStruct = struct[page]["strings"][string][word]["word"]
         dCharStruct = struct[page]["strings"][string][word]["dChar"]
-        wordPos = {"posXBegin" : struct[page]["strings"][string][word]["posXBegin"], "posXEnd" : struct[page]["strings"][string][word]["posXEnd"], "posYBegin" : struct[page]["strings"][string][word]["posYBegin"], "posYEnd" : struct[page]["strings"][string][word]["posYEnd"]}
+        charEndPosStruct = struct[page]["strings"][string][word]["charEndPos"]
+        wordPos = {"posXBegin" : struct[page]["strings"][string][word]["posXBegin"], "posXEnd" : struct[page]["strings"][string][word]["posXEnd"], "posYBegin" : struct[page]["strings"][string][word]["posYBegin"], "posYEnd" : struct[page]["strings"][string][word]["posYEnd"], "wordStruct" : wordStruct}
         
         sentencePart = wordStruct + chr(dCharStruct)
         #print("    #### W #### : " + word + ", word: '" + sentencePart + "'")
         #print("Page: " + str(page) + "', wordStruct : '" + str(wordStruct) + "', dCharStruct : '" + str(dCharStruct) + "', sentencePart: '" + str(sentencePart) + "'")
-        
-        #'isalnum', 'isalpha', 'isdecimal', 'isdigit', 'isidentifier', 'islower', 'isnumeric', 'isprintable', 'isspace', 'istitle', 'isupper',
-        
+
         if str(wordStruct) == '.\\\\n':
           sentence += '.'
           sentenceRule = 'directNewLine'          
@@ -101,14 +101,20 @@ def makeSentenceStruct(struct):
           sentenceRule = 'lastWordOnPage'
         
         sentence += sentencePart
-        sentenceWords[wordNumber] = wordPos
+        wordNumberFitted = "{:0>3.0f}".format(wordNumber)
+        #print('wordNumber: ' + str(wordNumber) + ', sentencePart: ' + sentencePart)
+        sentenceWords[wordNumberFitted] = wordPos
+        sentenceWordsMap[wordNumberFitted] = len(sentence)
         if not sentenceRule == '':
           #print(str(page) + ", " + str(sentenceNumber) + ", " + sentence)
-          sentenceStruct[page][sentenceNumber] = {"s" : sentence, "p" : sentenceWords}
+          sentenceStruct[page][sentenceNumber] = OrderedDict()
+          sentenceStruct[page][sentenceNumber] = { 'sen' : sentence, 'pos' : sentenceWords, 'map' : sentenceWordsMap }
+          
           #print("## Rule: '" + sentenceRule + "', sentence: " + sentence)
           sentenceNumber += 1
           sentence = ''
           sentenceWords = OrderedDict()
+          sentenceWordsMap = OrderedDict()
           wordNumber = 1
           sentenceRule = ''
         else:

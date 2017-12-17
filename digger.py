@@ -107,6 +107,10 @@ if 'preAction' in session:
   if args.debug == 1: dumpInits(args, session, '### after preAction')  
 
 ### Action-dependent args
+if args.action == 'getM' or args.action == 'getH':
+  p.add_argument('--repdfreader', dest="repdfreader", action='store_true', default=0, help='Recreate a pdf_dig pdfreader structure if cached')
+  p.add_argument('--resentence',  dest="resentence",  action='store_true', default=0, help='Recreate a pdf_dig sentence structure if cached')
+
 if args.action == 'getM':
   p.add_argument('--cognitions', dest="cognitions", type=str, help='Cognitions to dig')
   args = p.parse_known_args()[0]
@@ -121,8 +125,7 @@ elif args.action == 'getH':
 ###
 
 ### TO DO
-p.add_argument('--repdfreader', dest="repdfreader", type=int, default=0, help='Recreate a pdf_dig pdfreader structure if cached')
-p.add_argument('--resentence',  dest="resentence",  type=int, default=0, help='Recreate a pdf_dig sentence structure if cached')
+
 p.add_argument('--annselftest', dest="annselftest", type=int, default=0, help='Create annotation for reader self-test')
   #p.add_argument('--expdf', dest="exPDF", type=int, default=1, help='Export annotations to PDF')
   #p.add_argument('--exes', dest="exES", type=int, default=1, help='Export annotations to ES')    

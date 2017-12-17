@@ -20,7 +20,7 @@ def digTextFromPDF(args,session):
   
   sentenceStruct = OrderedDict()
   fnameSentence = session['diggedPath'] + session['srcHash'] + '.json'
-  if os.path.isfile(fnameSentence):
+  if os.path.isfile(fnameSentence) and args.resentence == 0:
     with open(fnameSentence, 'r') as f:
       sentenceStruct = json.load(f, object_pairs_hook=OrderedDict)
   else:

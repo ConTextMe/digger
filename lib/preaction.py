@@ -22,6 +22,7 @@ def preaction(args, session):
     cp(args, session)
   if path.islink(session['srcPath'] + session['srcHash'] + '.pdf'):
     session['contentHash'] = readlink(session['srcPath'] + session['srcHash'] + '.pdf').split('/')[-1].split('.')[0]
+    session['size'] = path.getsize(session['srcPath'] + session['srcHash'] + '.pdf')
   else:
     session = PDFFastRead(args, session)
   

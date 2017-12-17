@@ -12,30 +12,32 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
-def struct_annotate(args, session, sentenceStruct):
+def annotateAsDigestXML(args, session, sentenceStruct, annotationStruct):
   import shutil
   from os.path import expanduser
-    
-  AnnotationsFileWriter = open(session['mainPath'] + session['docFilename'] + '.xml','w')
-  AnnotationsBegin(AnnotationsFileWriter, args.fileLoc)
-  for page in sentenceStruct:
+  
+  digestFilename = str(session['size']) + '.' + session['contentHash'] + '.pdf'
+  AnnotationsFileWriter = open(session['mainPath'] + digestFilename + '.xml','w')
+  AnnotationsBegin(args, session, AnnotationsFileWriter)
+  for page in annotationStruct:
     AnnotationPageBegin(AnnotationsFileWriter,int(page))
-    AnnotationListBegin(AnnotationsFileWriter,session)
-    for sentence in sentenceStruct[page]:
-      if "p" in sentenceStruct[page][sentence]:
-        for word in sentenceStruct[page][sentence]["p"]:
-          AnnotationQuad(AnnotationsFileWriter,sentenceStruct[page]["size"],sentenceStruct[page][sentence]["p"][word])
+    AnnotationListBegin(AnnotationsFileWriter,session)    
+    for ex in annotationStruct[page]:    
+      for sentence in annotationStruct[page][ex]:
+        for wordNumber in annotationStruct[page][ex][sentence]:
+          wordNumberFitted = "{:0>3.0f}".format(wordNumber)
+          AnnotationQuad(AnnotationsFileWriter,sentenceStruct[page]["par"]["size"],sentenceStruct[page][sentence]['pos'][wordNumberFitted])
     AnnotationListEnd(AnnotationsFileWriter)
     AnnotationPageEnd(AnnotationsFileWriter)
   AnnotationEnd(AnnotationsFileWriter)
   
   AnnotationsFileWriter.close()
-  shutil.move(session['tmp_path'] + session['docFilename'] + '.xml', str(expanduser("~")) + '/.local/share/okular/docdata/' + session['docFilename'] + '.xml')  
+  shutil.move(session['mainPath'] + digestFilename + '.xml', str(expanduser("~")) + '/.local/share/okular/docdata/' + digestFilename + '.xml')  
 
-def AnnotationsBegin(AnnotationsFileWriter, fileLoc):
+def AnnotationsBegin(args, session, AnnotationsFileWriter):
   AnnotationsFileWriter.write('<?xml version="1.0" encoding="utf-8"?>\n')
   AnnotationsFileWriter.write('<!DOCTYPE documentInfo>\n')
-  AnnotationsFileWriter.write('<documentInfo url="' + fileLoc + '">\n')
+  AnnotationsFileWriter.write('<documentInfo url="' + str(session['size']) + '.' + session['contentHash'] + '.pdf">\n')
   AnnotationsFileWriter.write(' <pageList>\n')
 
 def AnnotationEnd(AnnotationsFileWriter):
