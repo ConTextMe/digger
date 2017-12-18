@@ -15,7 +15,9 @@
 from collections import OrderedDict
 import json
 import os.path
+import sys
 
+#@profile
 def digTextFromPDF(args,session):
   
   sentenceStruct = OrderedDict()
@@ -31,19 +33,20 @@ def digTextFromPDF(args,session):
     else:
       import lib.dig_PDFStemWord
       struct = lib.dig_PDFStemWord.getPDFStruct(args, session)
-      dump = json.dumps(struct)
+      dump = json.dumps(struct, separators=(',',':'))
       with open(fnameStruct, 'w') as f:
         f.write(dump)
     import lib.dig_PDFStemSentence
     intermStruct = OrderedDict()
     intermStruct = lib.dig_PDFStemSentence.makeIntermStruct(struct)    
     sentenceStruct = lib.dig_PDFStemSentence.makeSentenceStruct(intermStruct)
-    dump = json.dumps(sentenceStruct, indent=1, ensure_ascii=False)
+    dump = json.dumps(sentenceStruct, ensure_ascii=False, separators=(',',':')) #indent=1 for readable form
     with open(fnameSentence, 'w') as f:
       f.write(dump)
   
   if "annselftest" in args and args.annselftest == 1:
     import lib.okularAnnotations
     lib.okularAnnotations.struct_annotate(args,sentenceStruct,session)
-    
+   
+  print('Mem:sentenceStruct  ', sys.getsizeof(sentenceStruct)/1024, 'K')   
   return sentenceStruct

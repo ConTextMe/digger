@@ -41,7 +41,6 @@ def makeIntermStruct(struct):
 def makeSentenceStruct(struct):
   sentence = ''
   sentenceWords = OrderedDict()
-  sentenceWordsMap = OrderedDict()
   wordNumber = 1
   sentenceRule = ''
   sentenceStemmer = 0
@@ -61,8 +60,6 @@ def makeSentenceStruct(struct):
         wordStruct = struct[page]["strings"][string][word]["word"]
         dCharStruct = struct[page]["strings"][string][word]["dChar"]
         charEndPosStruct = struct[page]["strings"][string][word]["charEndPos"]
-        wordPos = {"posXBegin" : struct[page]["strings"][string][word]["posXBegin"], "posXEnd" : struct[page]["strings"][string][word]["posXEnd"], "posYBegin" : struct[page]["strings"][string][word]["posYBegin"], "posYEnd" : struct[page]["strings"][string][word]["posYEnd"], "wordStruct" : wordStruct}
-        
         sentencePart = wordStruct + chr(dCharStruct)
         #print("    #### W #### : " + word + ", word: '" + sentencePart + "'")
         #print("Page: " + str(page) + "', wordStruct : '" + str(wordStruct) + "', dCharStruct : '" + str(dCharStruct) + "', sentencePart: '" + str(sentencePart) + "'")
@@ -101,20 +98,19 @@ def makeSentenceStruct(struct):
           sentenceRule = 'lastWordOnPage'
         
         sentence += sentencePart
+        sentEndPos = len(sentence)        
         wordNumberFitted = "{:0>3.0f}".format(wordNumber)
-        #print('wordNumber: ' + str(wordNumber) + ', sentencePart: ' + sentencePart)
+        wordPos = {"posXBegin" : struct[page]["strings"][string][word]["posXBegin"], "posXEnd" : struct[page]["strings"][string][word]["posXEnd"], "posYBegin" : struct[page]["strings"][string][word]["posYBegin"], "posYEnd" : struct[page]["strings"][string][word]["posYEnd"], "b": sentEndPos - len(sentencePart), "e": sentEndPos - 1, "wordStruct" : wordStruct}
         sentenceWords[wordNumberFitted] = wordPos
-        sentenceWordsMap[wordNumberFitted] = len(sentence)
         if not sentenceRule == '':
           #print(str(page) + ", " + str(sentenceNumber) + ", " + sentence)
           sentenceStruct[page][sentenceNumber] = OrderedDict()
-          sentenceStruct[page][sentenceNumber] = { 'sen' : sentence, 'pos' : sentenceWords, 'map' : sentenceWordsMap }
+          sentenceStruct[page][sentenceNumber] = { 'sen' : sentence, 'pos' : sentenceWords}
           
           #print("## Rule: '" + sentenceRule + "', sentence: " + sentence)
           sentenceNumber += 1
           sentence = ''
           sentenceWords = OrderedDict()
-          sentenceWordsMap = OrderedDict()
           wordNumber = 1
           sentenceRule = ''
         else:

@@ -12,6 +12,7 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
+#@profile
 def preaction(args, session):
   from os import path, readlink
   if session['preAction'] == 'download':
@@ -22,10 +23,10 @@ def preaction(args, session):
     cp(args, session)
   if path.islink(session['srcPath'] + session['srcHash'] + '.pdf'):
     session['contentHash'] = readlink(session['srcPath'] + session['srcHash'] + '.pdf').split('/')[-1].split('.')[0]
-    session['size'] = path.getsize(session['srcPath'] + session['srcHash'] + '.pdf')
   else:
     session = PDFFastRead(args, session)
   
+  session['size'] = path.getsize(session['srcPath'] + session['srcHash'] + '.pdf')
   return session
     
 def download(args, session):
@@ -55,7 +56,8 @@ def genPDF(args, session):
 def cp(args, session):
   from shutil import copyfile
   copyfile(args.src, session['srcPath'] + session['srcHash'] + '.pdf')
-    
+
+#@profile    
 def PDFFastRead(args, session):
   import pdfparser.poppler as pdf
   from shutil import move

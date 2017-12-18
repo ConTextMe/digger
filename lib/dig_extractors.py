@@ -12,6 +12,7 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
+#@profile
 def init(args, session):
   import importlib
   extractor = {}
