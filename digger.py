@@ -21,6 +21,7 @@ import argparse
 import datetime
 import importlib
 import hashlib
+import gc
 from os import listdir, path, makedirs
 from collections import OrderedDict
 ###
@@ -61,6 +62,7 @@ session['currDatetime'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 ### Pre-Actions
 p = argparse.ArgumentParser(description='ConTextMe - Digger')
+gc.enable()
 ###
 
 ### Argument constructor

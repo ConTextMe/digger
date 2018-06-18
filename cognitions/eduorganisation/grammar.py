@@ -13,9 +13,12 @@
 ######     ######     ######     ######     ######
 
 from __future__ import unicode_literals
-from yargy import (rule, fact, not_, and_, or_, attribute,)
-from yargy.predicates import (gram, caseless, normalized, is_title, dictionary, custom, eq, )
+from yargy import (rule, not_, and_, or_, )
+#attribute
+from yargy.predicates import (gram, caseless, normalized, is_title, dictionary, custom, eq, in_, is_capitalized,)
 from yargy.relations import (gnc_relation, case_relation,)
+from yargy.interpretation import fact
+from yargy.tokenizer import QUOTES
 
 ### NATASHA EXTRACTOR DEF
 from natasha.extractors import Extractor
@@ -106,24 +109,24 @@ R2_SIMPLE_W_ADJF = rule(
 
 R2_QUOTED = or_(rule(
     EDUORGANISATION_DICT,
-    gram('QUOTE'),
+    in_(QUOTES),
     not_(
         or_(
-            gram('QUOTE'),
-            gram('END-OF-LINE'),
+            in_(QUOTES),
+            #gram('END-OF-LINE'),
         )).repeatable(),
-    gram('QUOTE')),
+    in_(QUOTES)),
     
     rule(
-      gram('QUOTE'),
+      in_(QUOTES),
       ADJF.optional(),      
       EDUORGANISATION_DICT,      
       not_(
           or_(
-              gram('QUOTE'),
-              gram('END-OF-LINE'),
+              in_(QUOTES),
+              #gram('END-OF-LINE'),
           )).repeatable(),
-      gram('QUOTE'),        
+      in_(QUOTES),        
 ))
 
 
@@ -136,7 +139,7 @@ R2_KNOWN = rule(
 ### INTERPRETATION RULE
 INTERPRET_NAME = rule(or_(
   R2_QUOTED,
-  R2_SIMPLE_W_ADJF,
+  #R2_SIMPLE_W_ADJF,
   R2_KNOWN,
   R1_SIMPLE,  
   )
@@ -152,7 +155,7 @@ INTERPRET_TMP = rule(or_(
 ### SUMMARY RULE
 EDUORGANISATION_ = or_(
   INTERPRET_NAME,
-  INTERPRET_TMP,  
+  #INTERPRET_TMP,  
 )
 ###
 

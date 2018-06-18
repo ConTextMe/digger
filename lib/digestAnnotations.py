@@ -12,6 +12,14 @@
 ##    Indent = space;    2 chars;
 ######     ######     ######     ######     ######
 
+def annotateAsDigestQt(args, session):
+  import PySide2  
+  #import cppyy
+  from PySide2.QtCore import QCommandLineParser
+  from PySide2.QtWidgets import QApplication
+  #from KF5.CoreAddons import KAboutData, KAboutLicense
+  #from KF5.WidgetsAddons import KGuiItem, KMessageBox
+
 #@profile
 def annotateAsDigestXML(args, session, sentenceStruct, annotationStruct):
   import shutil
