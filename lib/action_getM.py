@@ -83,7 +83,8 @@ def extractM(args, session, sentenceStruct):
           try:
             matches = extractor[ex]['ExtractorHandler'](sentenceStruct[page][sentence]['sen'])
           except TypeError:
-              dumpVar(sentence, 'BUG :: extractor has no sentence')  
+              print('### BUG in extractor in sentence ' + str(sentence) + ', page: ' + str(page) + ', content: ' + str(sentenceStruct[page][sentence]['sen']))    
+              matches = extractor[ex]['ExtractorHandler'](sentenceStruct[page][sentence]['sen'])
           else:
             for match in matches:
               if match.span[0] in mapWordStruct[page][sentence]:

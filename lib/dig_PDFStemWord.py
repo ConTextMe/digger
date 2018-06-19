@@ -109,7 +109,10 @@ class PDFPageWordStemmer(PDFPageAggregator):
                 charCoords[charsNumber]["ord"] = charTextOrd
                 charCoords[charsNumber]["char"] = charText                
 
-              #print("1. Char: " + charText + " , Ord: " + str(charTextOrd) + " full: " + str(child))
+              if isinstance(child,LTChar) and str(child.fontname) == 'PHXCXN+TimesNewRomanPS-BoldMT':
+                print('Caption - ' + str(charCoords[charsNumber]["char"]))
+                continue
+            #print("1. Char: " + charText + " , Ord: " + str(charTextOrd) + " full: " + str(child))
               if charTextOrd in (10, 32, 33, 34, 40, 41, 44, 45, 46, 58, 59, 63, 173): #\n_\s_!_"_(_)_,_-_._:_;_?_\xad
                 #if isinstance(child, (LTChar)) and charCoords[charsNumber]["y0"] == 540.131: print("word: '" + word + "', ord : " + str(charTextOrd) + ", chNum : " + str(charsNumber) + ", ch : " + str(child))
                 wordLen = len(word)
@@ -123,19 +126,20 @@ class PDFPageWordStemmer(PDFPageAggregator):
                   #wordLen = wordLen - 1
                   if wordLen >= 0:
                     charsNumber = charsNumber - 1
-                    #print("3. word: " + word + " , Ord: " + str(charCoords[charsNumber]["ord"]) + " xCoord: " + str(charCoords[charsNumber]["x0"]) + " Len: " + str(wordLen))                                                          
-                    if charCoords[charsNumber]["ord"] == 173:
-                      charTextOrd = 00
-                    elif charCoords[charsNumber]["ord"] == 46:  
-                      word = word + '\\\\n'
-                      charTextOrd = 00
-                    elif charCoords[charsNumber]["ord"] == 32:  
-                      charTextOrd = 32
-                    else:
-                      #print(str(child) + ' : ' + str(charCoords[charsNumber]["ord"])+ " : '" + chr(charCoords[charsNumber]["ord"]) + "', word: " + word)
-                      word = word + ' '
-                      charTextOrd = 32
-                    # BUG end char not highlighed
+                    #print("3. word: " + word + " , Ord: " + str(charCoords[charsNumber]["ord"]) + " xCoord: " + str(charCoords[charsNumber]["x0"]) + " Len: " + str(wordLen))             
+                    if charCoords[charsNumber]:
+                      if charCoords[charsNumber]["ord"] == 173:
+                        charTextOrd = 00
+                      elif charCoords[charsNumber]["ord"] == 46:  
+                        word = word + '\\\\n'
+                        charTextOrd = 00
+                      elif charCoords[charsNumber]["ord"] == 32:  
+                        charTextOrd = 32
+                      else:
+                        #print(str(child) + ' : ' + str(charCoords[charsNumber]["ord"])+ " : '" + chr(charCoords[charsNumber]["ord"]) + "', word: " + word)
+                        word = word + ' '
+                        charTextOrd = 32
+                      # BUG end char not highlighed
                 
                 if wordLen > 0:
                   y0Fitted = "{:0>11.6f}".format(charCoords[charsNumber]["y0"])

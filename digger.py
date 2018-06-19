@@ -135,7 +135,7 @@ elif args.action == 'getH':
 
 ### TO DO
 
-p.add_argument('--annselftest', dest="annselftest", type=int, default=0, help='Create annotation for reader self-test')
+p.add_argument('--annselftest', dest="annselftest", action='store_true', default=0, help='Create annotation for reader self-test')
   #p.add_argument('--expdf', dest="exPDF", type=int, default=1, help='Export annotations to PDF')
   #p.add_argument('--exes', dest="exES", type=int, default=1, help='Export annotations to ES')    
 ###

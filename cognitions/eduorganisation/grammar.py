@@ -59,7 +59,7 @@ GENT_GROUP = rule(
 #ADJF
 ADJF_PREFIX_COUNTABLE = rule(
     or_(caseless('и'), eq(',')).optional(),
-).repeatable()
+)
 
 
 ADJF_PREFIX_ADJF = and_(
@@ -139,7 +139,7 @@ R2_KNOWN = rule(
 ### INTERPRETATION RULE
 INTERPRET_NAME = rule(or_(
   R2_QUOTED,
-  #R2_SIMPLE_W_ADJF,
+  R2_SIMPLE_W_ADJF,
   R2_KNOWN,
   R1_SIMPLE,  
   )

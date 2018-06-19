@@ -45,8 +45,9 @@ def digTextFromPDF(args,session):
       f.write(dump)
   
   if "annselftest" in args and args.annselftest == 1:
-    import lib.okularAnnotations
-    lib.okularAnnotations.struct_annotate(args,sentenceStruct,session)
+    import lib.digestAnnotations
+    #annotationStruct = {}; annotationStruct['color'] = "#0713ff"; annotationStruct['opacity'] = "0.2"
+    #lib.digestAnnotations.annotateAsDigestXML(args, session, sentenceStruct, annotationStruct)
    
   print('Mem:sentenceStruct  ', sys.getsizeof(sentenceStruct)/1024, 'K')   
   return sentenceStruct
