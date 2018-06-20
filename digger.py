@@ -17,36 +17,18 @@
 ### SYS
 import sys
 import argparse
-import datetime
 import importlib
 import hashlib
 import gc
-from os import listdir, path, makedirs
-from collections import OrderedDict
+from os import listdir, path
 ###
 
 ### LOCAL
 from  lib.func import get_runPath, dumpInits
+import lib.static
 ###
 
-### VALS
-session = OrderedDict()
-session['name'] = 'digger'
-session['mainPath'] = '/tmp/' + session['name'] + '/'
-makedirs(session['mainPath'], exist_ok=True)
-session['srcPath'] = session['mainPath'] + 'src/'
-makedirs(session['srcPath'], exist_ok=True)
-session['prepocessedPath'] = session['mainPath'] + 'prepocessed/'
-makedirs(session['prepocessedPath'], exist_ok=True)
-session['diggedPath'] = session['mainPath'] + 'digged/'
-makedirs(session['diggedPath'], exist_ok=True)
-session['pdfstructPath'] = session['mainPath'] + 'pdfstructs/'
-makedirs(session['pdfstructPath'], exist_ok=True)
-session['esPath'] = session['mainPath'] + 'es_json/'
-makedirs(session['esPath'], exist_ok=True)
-
-dirIsTemplate = {"_tmpl"}
-
+### ACTIONS
 actions = ['genS', 'getM', 'getH', 'calls']
 
 actionsMined = ['all','my', 'by']
@@ -55,32 +37,25 @@ actionsGenerate = ['annschema', 'toc']
 actionsGet = ['hash', 'isbn']
 ###
 
-### Vars
-session['currDatetime'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-###
 
 ### Pre-Actions
-p = argparse.ArgumentParser(description='ConTextMe - Digger')
+p = argparse.ArgumentParser(description='Digger')
 gc.enable()
+dirIsTemplate = {"_tmpl"}
 ###
 
 ### Argument constructor
-if str(sys.argv[0]).endswith('memory_profiler.py'):
-  p.add_argument('action2', default='1')    
-  p.add_argument('-a', dest="action", type=str, default='getM', help='Document context')  
-  p.add_argument('-s', dest="src",  type=str, default='/media/storage/Library/Org/ConTextMe/products/_testpdfs/Malinovsky_10.pdf', help='Source to dig')
-  p.add_argument('-c', dest="context", type=str, default='cyber', help='Document context')
+if not sys.argv[1]:
+  p.add_argument('--action', dest="action", type=str, required=True, help='Digger action', choices=actions)
 else:
-  if not sys.argv[1]:
-    p.add_argument('--action', dest="action", type=str, required=True, help='Digger action', choices=actions)
-  else:
-    action = sys.argv[1]
-  p.add_argument('action', choices=actions)    
-  p.add_argument('-s', dest="src",  type=str, required=True, help='Source to dig')
-  p.add_argument('-c', dest="context", type=str, required=True, help='Document context')
+  action = sys.argv[1]
+p.add_argument('action', choices=actions)    
+p.add_argument('-s', dest="src",  type=str, required=True, help='Source to dig')
+p.add_argument('-c', dest="context", type=str, required=True, help='Document context')
 
 p.add_argument('--debug', dest="debug",  action='store_true', default=0, help='Debug mode')
 args = p.parse_known_args()[0]
+session = lib.static.session()
 session['srcHash'] = hashlib.sha1(args.src.encode('utf-8')).hexdigest()
 ### Source choose
 
