@@ -23,31 +23,33 @@ def digTextFromPDF(args,session):
   sentenceStruct = OrderedDict()
   fnameSentence = session['diggedPath'] + session['srcHash'] + '.json'
   if os.path.isfile(fnameSentence) and args.resentence == 0:
-    with open(fnameSentence, 'r') as f:
-      sentenceStruct = json.load(f, object_pairs_hook=OrderedDict)
+    #with open(fnameSentence, 'r') as f:
+      #sentenceStruct = json.load(f, object_pairs_hook=OrderedDict)
+      print('Using cached pdfStruct & sentenceStruct')
   else:
     fnameStruct = session['pdfstructPath'] + session['srcHash'] + '.json'
-    if os.path.isfile(fnameStruct):
+    if os.path.isfile(fnameStruct) and args.repdfreader == 0:
       with open(fnameStruct, 'r') as f:
         struct = json.load(f, object_pairs_hook=OrderedDict)
+        print('Using cached pdfStruct')
     else:
-      import lib.dig_PDFStemWord
-      struct = lib.dig_PDFStemWord.getPDFStruct(args, session)
+      import lib.stemmers.StemWord
+      struct = lib.stemmers.StemWord.getPDFStruct(args, session)
       dump = json.dumps(struct, separators=(',',':'))
       with open(fnameStruct, 'w') as f:
         f.write(dump)
-    import lib.dig_PDFStemSentence
+    import lib.stemmers.StemSentence
     intermStruct = OrderedDict()
-    intermStruct = lib.dig_PDFStemSentence.makeIntermStruct(struct)    
-    sentenceStruct = lib.dig_PDFStemSentence.makeSentenceStruct(intermStruct)
+    intermStruct = lib.stemmers.StemSentence.makeIntermStruct(struct)    
+    sentenceStruct = lib.stemmers.StemSentence.makeSentenceStruct(intermStruct)
     dump = json.dumps(sentenceStruct, ensure_ascii=False, separators=(',',':')) #indent=1 for readable form
     with open(fnameSentence, 'w') as f:
       f.write(dump)
   
-  if "annselftest" in args and args.annselftest == 1:
-    import lib.digestAnnotations
+  #if "annselftest" in args and args.annselftest == 1:
+    #import lib.digestAnnotations
     #annotationStruct = {}; annotationStruct['color'] = "#0713ff"; annotationStruct['opacity'] = "0.2"
     #lib.digestAnnotations.annotateAsDigestXML(args, session, sentenceStruct, annotationStruct)
    
-  print('Mem:sentenceStruct  ', sys.getsizeof(sentenceStruct)/1024, 'K')   
-  return sentenceStruct
+  #print('Mem:sentenceStruct  ', sys.getsizeof(sentenceStruct)/1024, 'K')   
+  

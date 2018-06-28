@@ -12,17 +12,14 @@
 ########    #######    ########    #######    ########    ########
 
 
-name = 'eduorganisation'
-
-def factData(args, session, match):
-    data = {
-      "orgname" : match.fact.name,
-      "tmp" : match.fact.tmp,
-      "tmp2" : match.fact.tmp2,
-      }
-    return data
-
-
-def visualSettings():
-  extractors = {}; extractors['color'] = "#0713ff"; extractors['opacity'] = "0.2"
-  return extractors
+#@profile
+def init(args, session):
+  import importlib
+  extractor = {}
+  
+  for ex in session['cognitions']:
+    extractor[ex] = {}
+    facts = importlib.import_module('cognitions.' + ex.lower() + '.fact')
+    grammar = importlib.import_module('cognitions.' + ex.lower() + '.grammar')  
+    extractor[ex]['ExtractorHandler'] = eval('grammar.' + ex + 'Extractor')()
+  return extractor

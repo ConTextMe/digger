@@ -18,18 +18,26 @@ from collections import OrderedDict
 def session():
   session = OrderedDict()
   session['name'] = 'digger'
-  session['mainPath'] = '/tmp/' + session['name'] + '/'
+  
+  session['mainPath'] = '/tmp/semantic/'
   makedirs(session['mainPath'], exist_ok=True)
-  session['srcPath'] = session['mainPath'] + 'src/'
+  
+  session['srcPath'] = session['mainPath'] + session['name'] + '_file_src/'
   makedirs(session['srcPath'], exist_ok=True)
-  session['prepocessedPath'] = session['mainPath'] + 'prepocessed/'
+  
+  session['prepocessedPath'] = session['mainPath'] + session['name'] + '_file_prepoc/'
   makedirs(session['prepocessedPath'], exist_ok=True)
-  session['diggedPath'] = session['mainPath'] + 'digged/'
+  
+  session['diggedPath'] = session['mainPath'] + session['name'] + '_struct_step2/'
   makedirs(session['diggedPath'], exist_ok=True)
-  session['pdfstructPath'] = session['mainPath'] + 'pdfstructs/'
+  
+  session['pdfstructPath'] = session['mainPath'] + session['name'] + '_struct_step1/'
   makedirs(session['pdfstructPath'], exist_ok=True)
-  session['esPath'] = session['mainPath'] + 'es_json/'
-  makedirs(session['esPath'], exist_ok=True)
+  
+  session['factsPath'] = session['mainPath'] + session['name'] + '_jsons_facts/'
+  makedirs(session['factsPath'], exist_ok=True)
+  
   session['currDatetime'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+  
   return session
 

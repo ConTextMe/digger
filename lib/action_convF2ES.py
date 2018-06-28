@@ -12,17 +12,6 @@
 ########    #######    ########    #######    ########    ########
 
 
-name = 'eduorganisation'
-
-def factData(args, session, match):
-    data = {
-      "orgname" : match.fact.name,
-      "tmp" : match.fact.tmp,
-      "tmp2" : match.fact.tmp2,
-      }
-    return data
-
-
-def visualSettings():
-  extractors = {}; extractors['color'] = "#0713ff"; extractors['opacity'] = "0.2"
-  return extractors
+#@profile
+def init(args, session):
+  print(1)

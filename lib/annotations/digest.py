@@ -30,7 +30,7 @@ def annotateAsDigestXML(args, session, sentenceStruct, annotationStruct):
   for page in annotationStruct:
     AnnotationPageBegin(AnnotationsFileWriter,int(page))
     for ex in annotationStruct[page]:    
-      AnnotationOptsBegin(AnnotationsFileWriter,session, session['annotationSettings'][ex])      
+      AnnotationOptsBegin(AnnotationsFileWriter,session, session['visualSettings'][ex])      
       for sentence in annotationStruct[page][ex]:
         for wordNumber in annotationStruct[page][ex][sentence]:
           wordNumberFitted = "{:0>3.0f}".format(int(wordNumber))
