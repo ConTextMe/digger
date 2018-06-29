@@ -20,13 +20,14 @@ def preaction(args, session):
     genPDF(args, session)
   elif session['preAction'] == 'cp':
     cp(args, session)
-  if path.islink(session['srcPath'] + session['srcHash'] + '.pdf'):
-    session['contentHash'] = readlink(session['srcPath'] + session['srcHash'] + '.pdf').split('/')[-1].split('.')[0]
-  else:
-    session = PDFFastRead(args, session)
+  #if path.islink(session['srcPath'] + session['srcHash'] + '.pdf'):
+    #session['contentHash'] = readlink(session['srcPath'] + session['srcHash'] + '.pdf').split('/')[-1].split('.')[0]
+  #else:
+    #session = PDFFastRead(args, session)
   
   session['size'] = path.getsize(session['srcPath'] + session['srcHash'] + '.pdf')
   return session
+    
     
 def download(args, session):
   import sys, os
@@ -40,7 +41,8 @@ def download(args, session):
   else:
     sys.exit("non-url")  
 
-def genPDF(args, session):
+
+def url2PDF(args, session):
   import sys, os
 
   if session['srcType'] == 'url':
@@ -51,6 +53,12 @@ def genPDF(args, session):
       HTML(args.src).write_pdf(session['srcPath'] + session['srcHash'] + '.pdf')
   else:
     sys.exit("non-url")  
+  
+  
+def doc2PDF(args, session):
+  import sys, os
+  a = 1
+  
   
 def cp(args, session):
   from shutil import copyfile

@@ -16,9 +16,7 @@ name = 'eduorganisation'
 
 def factData(args, session, match):
     data = {
-      "orgname" : match.fact.name,
-      "tmp" : match.fact.tmp,
-      "tmp2" : match.fact.tmp2,
+      "orgname" : match.fact.name
       }
     return data
 

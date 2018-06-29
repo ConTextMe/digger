@@ -18,5 +18,11 @@ from  lib.func import get_dictPath, load_regex
 from natasha.data import load_dict
 from yargy.predicates import (dictionary)
 
-EDUORGANISATION_DICT = dictionary(set(load_dict(get_dictPath('eduorganisation', 'dict_main.txt'))))
-EDUORGANISATION_DICT_REGEXP = re.compile(load_regex(get_dictPath('eduorganisation', 'dict_main.txt')))
+IN_FIRST = dictionary(set(load_dict('first.txt')))
+#FIRST_DICT_REGEXP = re.compile(load_regex('first.txt'))
+
+IN_MAYBE_FIRST = dictionary(set(load_dict('maybe_first.txt')))
+#MAYBE_FIRST_DICT_REGEXP = re.compile(load_regex('maybe_first.txt')
+                                         
+IN_LAST = dictionary(set(load_dict('last.txt')))
+#LAST_DICT_REGEXP = re.compile(load_regex('last.txt')

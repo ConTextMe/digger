@@ -11,7 +11,14 @@
 ##    Indent = space;    2 chars;
 ########    #######    ########    #######    ########    ########
 
+import os.path
+import subprocess
 
 #@profile
+
+
 def init(args, session):
-  print(1)
+  for ex in session['cognitions']: 
+    esJSON = session['esPath'] + session['srcHash'] + '_' + ex + '.json'
+    if os.path.isfile(esJSON) and os.path.getsize(esJSON) > 2:
+      subprocess.Popen(['/usr/bin/curl', '-k', '--user',  session['esAuth'], '-XPOST', session['esHost']+"/scv_facts/type/_bulk?pretty", '-H', 'Content-Type: application/x-ndjson', '--data-binary', '@'+esJSON])

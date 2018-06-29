@@ -36,6 +36,9 @@ def session():
   
   session['factsPath'] = session['mainPath'] + session['name'] + '_jsons_facts/'
   makedirs(session['factsPath'], exist_ok=True)
+
+  session['esPath'] = session['mainPath'] + session['name'] + '_jsons_es/'
+  makedirs(session['esPath'], exist_ok=True)
   
   session['currDatetime'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   

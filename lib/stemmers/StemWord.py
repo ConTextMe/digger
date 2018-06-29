@@ -100,7 +100,11 @@ class PDFPageWordStemmer(PDFPageAggregator):
           for child in item:
             if isinstance(child, (LTChar, LTAnno)):
               charText = child.get_text()
-              charTextOrd = ord(charText)
+              try:
+                charTextOrd = ord(charText)
+              except TypeError:
+                    print('### BUG in char extractor')
+                    break
               if isinstance(child, (LTChar)):
                 charCoords[charsNumber]["x0"] = round(child.x0, 6)
                 charCoords[charsNumber]["x1"] = round(child.x1, 6)

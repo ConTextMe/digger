@@ -33,20 +33,21 @@ import lib.static
 #S - Sentence, F - Facts, A - Annotation, AS - Annotation Schema, ES - ElasticSearch
 
 actionsArray = ['digS', 'digF', 'sendF', 'convF2A', 'digA', 'digAS']
+actionModes = ['simple', 'semantic']
 actions = OrderedDict()
 actions['digS']    = {'digS':1}
 actions['digF']    = {**actions['digS'], 'digF':2}
 actions['sendF']   = {**actions['digF'], 'convF2ES':3, 'esSend':4}
 actions['convF2A'] = {**actions['digF'], 'annotateAsDigestXML':3}
-actions['digA']    = ['extractM']
-actions['digAS']   = ['extractAnnSchema']
 
-actions
+#### REWORK
+#actions['digA']    = ['extractM']
+#actions['digAS']   = ['extractAnnSchema']
 
-digA_modes = ['all','my', 'by']
-digA_by_modes = ['author','scheme','viewpoint', 'date']
+#digA_modes = ['all','my', 'by']
+#digA_by_modes = ['author','scheme','viewpoint', 'date']
+#####
 
-digS_modes = ['simple', 'semantic']
 preAction = ['cp', 'genPDF', 'download'] 
 ###
 
@@ -64,22 +65,31 @@ else:
   action = sys.argv[1]
 p.add_argument('action', choices=actionsArray)    
 p.add_argument('-s', dest="src",  type=str, required=True, help='Source to dig')
+p.add_argument('-m', dest="mode", type=str, default='simple', help='Mode: stadalone or semantic-backed', choices=actionModes)
 
 p.add_argument('--debug', dest="debug",  action='store_true', default=0, help='Debug mode')
 args = p.parse_known_args()[0]
 session = lib.static.session()
-session['srcHash'] = hashlib.sha1(args.src.encode('utf-8')).hexdigest()
+
 
 ### Source choose
+if args.mode == 'semantic':
+  p.add_argument('--srcHash', dest="srcHash", required=True, help='Use external srcHash')
+  p.add_argument('--docname', dest="docname", required=True, help='Use external docname')
+  p.add_argument('--person', dest="person", required=True, help='Use external person')
+  p.add_argument('--esAuth', dest="esAuth", required=True, help='Use external esAuth')
+  p.add_argument('--esHost', dest="esHost", required=True, help='Use external esHost')
+
 if path.isfile(args.src) and args.src.endswith('.pdf'):
   session['preAction'] = 'cp'  
   session['srcType'] = 'file'
   session['docFilename'] = path.basename(args.src)
   
 elif path.isfile(args.src) and (args.src.endswith('.doc') or args.src.endswith('.docx')):
-  session['preAction'] = 'genPDF'
-  session['srcType'] = 'file'
-  session['docFilename'] = path.basename(args.src)  
+  sys.exit(0)
+  #session['preAction'] = 'doc2PDF'
+  #session['srcType'] = 'file'
+  #session['docFilename'] = path.basename(args.src)  
 else:
   from urllib.parse import urlparse
   url = urlparse(args.src)
@@ -89,18 +99,15 @@ else:
     session['docFilename'] = path.basename(url.path)
     
   elif (url.scheme == 'http' or url.scheme == 'https') and len(url.netloc) > 1:
-    session['preAction'] = 'genPDF'
+    session['preAction'] = 'url2PDF'
     session['srcType'] = 'url'
     
   elif args.src == 'telegram':
     print('Boilerplate for' + args.src)
+  else:
+    print('FAIL: No preaction model for ' + args.src)
+    
   ##
-if 'preAction' in session:
-  from  lib.preaction import preaction
-  if args.debug == 1: dumpInits(args, session, '### before preAction')  
-  preaction(args, session)
-  if args.debug == 1: dumpInits(args, session, '### after preAction')  
-###
 
 ### Action-dependent args
 if 'digS' in actions[args.action]:
@@ -128,8 +135,29 @@ p.add_argument('--annselftest', dest="annselftest", action='store_true', default
   #p.add_argument('--exes', dest="exES", type=int, default=1, help='Export annotations to ES')    
 ###
 
-### Call digger
+### Final args parsing
 args = p.parse_args()
+
+if args.mode == 'semantic':
+  session['srcHash'] = args.srcHash
+  session['docname'] = args.docname
+  session['person']  = args.person
+  session['esAuth']  = args.esAuth
+  session['esHost']  = args.esHost
+  
+else:
+  session['srcHash'] = hashlib.sha1(args.src.encode('utf-8')).hexdigest()
+###
+
+### preActions
+if 'preAction' in session:
+  from  lib.preaction import preaction
+  if args.debug == 1: dumpInits(args, session, '### before preAction')  
+  preaction(args, session)
+  if args.debug == 1: dumpInits(args, session, '### after preAction')  
+###
+
+### Call digger
 for action in actions[args.action]:
   diggerAction = importlib.import_module('lib.action_' + action) #.lower()
   diggerAction.init(args,session)

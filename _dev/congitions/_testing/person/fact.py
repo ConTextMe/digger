@@ -12,11 +12,15 @@
 ########    #######    ########    #######    ########    ########
 
 
-from __future__ import unicode_literals
-import re
-from  lib.func import get_dictPath, load_regex
-from natasha.data import load_dict
-from yargy.predicates import (dictionary)
+name = 'eduorganisation'
 
-EDUORGANISATION_DICT = dictionary(set(load_dict(get_dictPath('eduorganisation', 'dict_main.txt'))))
-EDUORGANISATION_DICT_REGEXP = re.compile(load_regex(get_dictPath('eduorganisation', 'dict_main.txt')))
+def factData(args, session, match):
+    data = {
+      "name" : match.fact.name
+      }
+    return data
+
+
+def visualSettings():
+  extractors = {}; extractors['color'] = "#0713ff"; extractors['opacity'] = "0.2"
+  return extractors

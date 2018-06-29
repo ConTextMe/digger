@@ -28,7 +28,7 @@ class eduorganisationExtractor(Extractor):
 ###
 
 ## 1 - FACT INIT
-eduorganisation = fact('eduorganisation', ['name', 'tmp', 'tmp2'])
+eduorganisation = fact('eduorganisation', ['name'])
 from .dictionary import EDUORGANISATION_DICT, EDUORGANISATION_DICT_REGEXP
 ###
 
@@ -146,16 +146,11 @@ INTERPRET_NAME = rule(or_(
 ).interpretation(eduorganisation.name.normalized())
 
 
-INTERPRET_TMP = rule(or_(
-  R1_ADJF
-  )
-).interpretation(eduorganisation.tmp.normalized())
 ###
 
 ### SUMMARY RULE
 EDUORGANISATION_ = or_(
   INTERPRET_NAME,
-  #INTERPRET_TMP,  
 )
 ###
 

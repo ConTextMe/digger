@@ -27,7 +27,7 @@ def init(args, session):
 
   factsCached = 0
   for ex in session['cognitions']: 
-    factsJSON = session['factsPath'] + session['contentHash'] + '_' + ex + '.json'
+    factsJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '.json'
     if os.path.isfile(factsJSON) and args.refacts == 0:
       factsCached = factsCached + 1
     else:
@@ -73,8 +73,8 @@ def init(args, session):
     factData = OrderedDict()
     for ex in session['cognitions']: 
       
-      factsJSON = session['factsPath'] + session['contentHash'] + '_' + ex + '.json'
-      annotationJSON = session['factsPath'] + session['contentHash'] + '_' + ex + '_anno.json'
+      factsJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '.json'
+      annotationJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '_anno.json'
       if os.path.isfile(factsJSON) and args.refacts == 0:
           print('Using cached facts for ' + ex)
       else:
@@ -175,7 +175,8 @@ def init(args, session):
                             
                           annotationStruct[page][ex][sentence].append(i)
                         else:
-                          print("### FAIL!! range algo missed the fact on Page: " + str(page) + "', fact : '" + str(match.fact) + ', span: ' + str(match.span) + ', i: ' + str(int(span0)+ int(i)) + ', posSpan0: ' + str(posSpan0)+ ', Span0: ' + str(span0) + ', posSpan1: ' + str(posSpan1) + ', Span1: ' + str(span1) + ', i=' + str(i))
+                          print("### FAIL!! range algo missed the fact on Page: " + str(page) + "', fact : '" + str(match.fact) + ', span: ' + str(match.span) + ', i: ' + str(int(span0)+ int(i)) + ', posSpan0: ' + str(posSpan0)+ ', Span0: ' + str(span0) + ', Span1: ' + str(span1) + ', i=' + str(i))
+                          #', posSpan1: ' + str(posSpan1) + 
                           #print(sentenceStruct[page][sentence]['pos'])
                   start, stop = match.span
                   factResult = fact[ex].factData(args, session, match)
@@ -194,7 +195,7 @@ def init(args, session):
     ###ANNOTATIONS
       #session['visualSettings'] = visualSettings
       #annotateAsDigestXML(args, session, sentenceStruct, annotationStruct)
-      #filename = session['prepocessedPath'] + session['contentHash'] + '.pdf'
+      #filename = session['prepocessedPath'] + session['srcHash'] + '.pdf'
       #subprocess.Popen(["digest",filename])
       
       #annotateAsDigestQt(args, session)
