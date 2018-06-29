@@ -12,13 +12,11 @@
 ########    #######    ########    #######    ########    ########
 
 
-name = 'name'
+cname = 'eduorg'
 
 def factData(args, session, match):
     data = {
-      "fname" : match.fact.first,
-      "lname" : match.fact.last,
-      "mname" : match.fact.middle  
+      cname + "_name" : match.fact.name
       }
     return data
 

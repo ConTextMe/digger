@@ -1,0 +1,2 @@
+install --user git+https://github.com/chaimleib/intervaltree.git git+https://github.com/V-ctor/pymorphy2.git git+https://github.com/alexanderkuk/yargy.git git+https://github.com/natasha/natasha.git
+ 

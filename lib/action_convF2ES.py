@@ -17,6 +17,7 @@ import os
 
 #@profile
 def init(args, session):
+  if args.debug == 1: print('action_convF2ES')
   for ex in session['cognitions']: 
     factsJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '.json'
     if os.path.isfile(factsJSON) and os.path.getsize(factsJSON) > 2:

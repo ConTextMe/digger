@@ -11,8 +11,8 @@
 ##    Indent = space;    2 chars;
 ########    #######    ########    #######    ########    ########
 
-
 #@profile
 def init(args, session):
+  if args.debug == 1: print('action_digS')
   from lib.pdf.PDF import digTextFromPDF
   digTextFromPDF(args,session)

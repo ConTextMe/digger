@@ -12,11 +12,13 @@
 ########    #######    ########    #######    ########    ########
 
 
-name = 'eduorganisation'
+cname = 'date'
 
 def factData(args, session, match):
     data = {
-      "orgname" : match.fact.name
+      cname + "_year" : match.fact.year,
+      cname + "_month"  : match.fact.month,
+      cname + "_day"   : match.fact.day  
       }
     return data
 

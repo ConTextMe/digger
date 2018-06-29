@@ -19,36 +19,34 @@ from yargy.predicates import (gram, caseless, normalized, is_title, dictionary, 
 from yargy.relations import (gnc_relation, case_relation,)
 from yargy.interpretation import fact
 from yargy.tokenizer import QUOTES
-#from .name import (
-    #Name,
+from natasha.data import load_dict
 
-    #FIRST_LAST,
-    #LAST_FIRST,
-    #TITLE_FIRST_LAST,
-    #TITLE_LAST_FIRST,
+from natasha.grammars.name import SIMPLE_NAME
+from natasha.grammars.person import POSITION_NAME
 
-    #ABBR_FIRST_LAST,
-    #LAST_ABBR_FIRST,
-    #ABBR_FIRST_MIDDLE_LAST,
-    #LAST_ABBR_FIRST_MIDDLE,
+from yargy.rule.transformators import RuleTransformator
 
-    #TITLE_FIRST_MIDDLE,
-    #TITLE_FIRST_MIDDLE_LAST,
-    #TITLE_LAST_FIRST_MIDDLE,
 
-    #JUST_FIRST,
-    #JUST_LAST
-#)
+class StripInterpretationTransformator(RuleTransformator):
+    def visit_InterpretationRule(self, item):
+        return self.visit(item.rule)
+
+NAME = SIMPLE_NAME.transform(StripInterpretationTransformator)
+PERSON = POSITION_NAME.transform(StripInterpretationTransformator)
+
 ### NATASHA EXTRACTOR DEF
 from natasha.extractors import Extractor
-class personExtractor(Extractor):
+class eduorgExtractor(Extractor):
     def __init__(self):
-        super(personExtractor, self).__init__(PERSON)  
+        super(eduorgExtractor, self).__init__(EDUORG)  
 ###
+import re
+from  lib.func import get_dictPath, load_regex
+EDUORG_DICT = dictionary(set(load_dict(get_dictPath('eduorg', 'dict_main.txt'))))
+EDUORG_DICT_REGEXP = re.compile(load_regex(get_dictPath('eduorg', 'dict_main.txt')))
 
 ## 1 - FACT INIT
-person = fact('person', ['name'])
-from .dictionary import PERSON_DICT, PERSON_DICT_REGEXP
+eduorg = fact('eduorg', ['name'])
 ###
 
 ### 2 - INIT GRAMS & GRAM RULES (pymorphy2)
@@ -90,7 +88,7 @@ ADJF_PREFIX_ADJF = and_(
 ADJF_NORM = rule(
             and_(
             ADJF,
-            custom(lambda s: PERSON_DICT_REGEXP.search(s), types=(str))
+            custom(lambda s: EDUORG_DICT_REGEXP.search(s), types=(str))
             )
 ).repeatable()
 
@@ -106,7 +104,7 @@ ADJF_PREFIX = rule(
 
 ### 1-ST RING RULES
 R1_SIMPLE = rule(
-   PERSON_DICT,
+   EDUORG_DICT,
 ).repeatable()
 
 
@@ -127,7 +125,7 @@ R2_SIMPLE_W_ADJF = rule(
 
 
 R2_QUOTED = or_(rule(
-    PERSON_DICT,
+    EDUORG_DICT,
     in_(QUOTES),
     not_(
         or_(
@@ -139,7 +137,7 @@ R2_QUOTED = or_(rule(
     rule(
       in_(QUOTES),
       ADJF.optional(),      
-      PERSON_DICT,      
+      EDUORG_DICT,      
       not_(
           or_(
               in_(QUOTES),
@@ -162,17 +160,21 @@ INTERPRET_NAME = rule(or_(
   R2_KNOWN,
   R1_SIMPLE,  
   )
-).interpretation(person.name.normalized())
+).interpretation(eduorg.name.normalized())
 
 
 ###
 
 ### SUMMARY RULE
-PERSON_ = or_(
+EDUORG_ = or_(
   INTERPRET_NAME,
 )
 ###
 
 ### EXPORT RULE
-PERSON = PERSON_.interpretation(person)
+EDUORG = EDUORG_.interpretation(
+    eduorg.name
+).interpretation(
+    eduorg
+)
 ###

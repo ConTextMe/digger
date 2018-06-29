@@ -19,31 +19,32 @@ def init(args, session):
   import importlib
   import sys
   import json
-  import os.path
+  import os
   import gc
   import subprocess
   import lib.ner.extractors
   from lib.func import dumpVar
 
+  if args.debug == 1: print('action_digF')
   factsCached = 0
   for ex in session['cognitions']: 
     factsJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '.json'
-    if os.path.isfile(factsJSON) and args.refacts == 0:
+    if os.path.isfile(factsJSON) and args.refacts == 0 and os.path.getsize(factsJSON) > 2:
       factsCached = factsCached + 1
     else:
       factsCached = -1000
   
-  if factsCached > 0:
+  if factsCached > 0 and args.refacts == 0:
     print('Using cached for all facts')
   else:
-    
     extractor = lib.ner.extractors.init(args, session)
-    
+    if args.debug == 1: print('load json')
     fnameSentence = session['diggedPath'] + session['srcHash'] + '.json'
     if os.path.isfile(fnameSentence):
       with open(fnameSentence, 'r') as f:
         sentenceStruct = json.load(f, object_pairs_hook=OrderedDict)
-        
+    if args.debug == 1: print('json loaded')
+    
     fact = {}; visualSettings = {}
     annotationStruct = OrderedDict()
     mapWordStruct = OrderedDict()
@@ -75,7 +76,7 @@ def init(args, session):
       
       factsJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '.json'
       annotationJSON = session['factsPath'] + session['srcHash'] + '_' + ex + '_anno.json'
-      if os.path.isfile(factsJSON) and args.refacts == 0:
+      if os.path.isfile(factsJSON) and args.refacts == 0 and os.path.getsize(factsJSON) > 2:
           print('Using cached facts for ' + ex)
       else:
         factsJSONWriter = open(factsJSON,'w')
@@ -99,7 +100,6 @@ def init(args, session):
                 matches = extractor[ex]['ExtractorHandler'](sentenceStruct[page][sentence]['sen'])
               except TypeError:
                   print('### BUG in extractor in sentence ' + str(sentence) + ', page: ' + str(page) + ', content: ' + str(sentenceStruct[page][sentence]['sen']))    
-                  matches = extractor[ex]['ExtractorHandler'](sentenceStruct[page][sentence]['sen'])
               else:
                 for match in matches:
                   if match.span[0] in mapWordStruct[page][sentence]:
@@ -130,8 +130,14 @@ def init(args, session):
 
                   if span0 == 0 or span1 == 0:
                     if span0 == 0:
-                      b = sentenceStruct[page][sentence]['pos'][span1]['b']
-                      e = sentenceStruct[page][sentence]['pos'][span1]['e']
+                      if span1 in sentenceStruct[page][sentence]['pos']:
+                        b = sentenceStruct[page][sentence]['pos'][span1]['b']
+                        e = sentenceStruct[page][sentence]['pos'][span1]['e']
+                      else:
+                        print('### FAIL!! no "b" and "e" in span1')                                     
+                        b = 0
+                        e = 0
+                        
                       if match.span[0] > b and match.span[0] < e:
                         span0 = b
                       else:

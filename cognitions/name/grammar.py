@@ -13,39 +13,53 @@
 
 
 from __future__ import unicode_literals
-from yargy import (rule, not_, and_, or_, )
 #attribute
-from yargy.predicates import (gram, caseless, normalized, is_title, dictionary, custom, eq, in_, is_capitalized, is_single, tag)
-from yargy.relations import (gnc_relation, case_relation,)
+from yargy import (rule, and_, or_, not_,)
 from yargy.interpretation import fact
-from yargy.tokenizer import QUOTES
-
-
+from yargy.predicates import (eq, length_eq, gram, tag, is_single, is_capitalized)
 from yargy.predicates.bank import DictionaryPredicate as dictionary
+from yargy.relations import gnc_relation
+from natasha.data import load_dict
 from yargy.rule.transformators import RuleTransformator
 from yargy.rule.constructors import Rule
 from yargy.predicates.constructors import AndPredicate
 
 ### NATASHA EXTRACTOR DEF
+from natasha.crf import (CrfTagger, NAME_MODEL, get_name_features)
+from natasha.grammars.name import (NAME)
 from natasha.extractors import Extractor
 class nameExtractor(Extractor):
     def __init__(self):
-        super(nameExtractor, self).__init__(NAME)  
+        tagger = CrfTagger(
+            NAME_MODEL,
+            get_name_features
+        )
+        super(nameExtractor, self).__init__(
+            NAME,
+            tagger=tagger
+        )
 ###
 
-## 1 - FACT INIT
-name = fact('name', ['first', 'last', 'middle', 'nick'])
+### Dictionaries
+IN_FIRST = dictionary(set(load_dict('first.txt')))
+IN_MAYBE_FIRST = dictionary(set(load_dict('maybe_first.txt')))
+IN_LAST = dictionary(set(load_dict('last.txt')))
+###
 
-from .dictionary import IN_FIRST, IN_MAYBE_FIRST, IN_LAST
+
+Name = fact('Name',['first', 'middle', 'last', 'nick'])
+
+
+################# UNMODIFIED NATASHA #################
 gnc = gnc_relation()
-###
 
-### 2 - INIT GRAMS & GRAM RULES (pymorphy2)
-### 1-ST RING RULES
-### 2-ST RING RULES
-### INTERPRETATION RULE
-### SUMMARY RULE
-###
+
+########
+#
+#   FIRST
+#
+########
+
 
 TITLE = is_capitalized()
 
@@ -71,14 +85,14 @@ FIRST = and_(
         IN_FIRST
     )
 ).interpretation(
-    name.first.inflected()
+    Name.first.inflected()
 ).match(gnc)
 
 FIRST_ABBR = and_(
     ABBR,
     TITLE
 ).interpretation(
-    name.first
+    Name.first
 ).match(gnc)
 
 
@@ -96,7 +110,7 @@ LAST = and_(
         IN_LAST
     )
 ).interpretation(
-    name.last.inflected()
+    Name.last.inflected()
 ).match(gnc)
 
 
@@ -108,14 +122,14 @@ LAST = and_(
 
 
 MIDDLE = PATR.interpretation(
-    name.middle.inflected()
+    Name.middle.inflected()
 ).match(gnc)
 
 MIDDLE_ABBR = and_(
     ABBR,
     TITLE
 ).interpretation(
-    name.middle
+    Name.middle
 ).match(gnc)
 
 
@@ -233,7 +247,7 @@ NAME = or_(
     JUST_FIRST,
     JUST_LAST,
 ).interpretation(
-    name
+    Name
 )
 
 
@@ -251,7 +265,3 @@ class StripCrfTransformator(RuleTransformator):
 SIMPLE_NAME = NAME.transform(
     StripCrfTransformator
 )
-
-### EXPORT RULE
-NAME = NAME.transform(StripCrfTransformator)
-###

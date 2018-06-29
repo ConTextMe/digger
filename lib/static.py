@@ -22,22 +22,22 @@ def session():
   session['mainPath'] = '/tmp/semantic/'
   makedirs(session['mainPath'], exist_ok=True)
   
-  session['srcPath'] = session['mainPath'] + session['name'] + '_file_src/'
+  session['srcPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'file_src/'
   makedirs(session['srcPath'], exist_ok=True)
   
-  session['prepocessedPath'] = session['mainPath'] + session['name'] + '_file_prepoc/'
+  session['prepocessedPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'file_prepoc/'
   makedirs(session['prepocessedPath'], exist_ok=True)
-  
-  session['diggedPath'] = session['mainPath'] + session['name'] + '_struct_step2/'
-  makedirs(session['diggedPath'], exist_ok=True)
-  
-  session['pdfstructPath'] = session['mainPath'] + session['name'] + '_struct_step1/'
+   
+  session['pdfstructPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'struct_step1/'
   makedirs(session['pdfstructPath'], exist_ok=True)
   
-  session['factsPath'] = session['mainPath'] + session['name'] + '_jsons_facts/'
+  session['diggedPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'struct_step2/'
+  makedirs(session['diggedPath'], exist_ok=True)
+  
+  session['factsPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'jsons_facts/'
   makedirs(session['factsPath'], exist_ok=True)
 
-  session['esPath'] = session['mainPath'] + session['name'] + '_jsons_es/'
+  session['esPath'] = session['mainPath'] + '/' + session['name'] + '/' + 'jsons_es/'
   makedirs(session['esPath'], exist_ok=True)
   
   session['currDatetime'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
